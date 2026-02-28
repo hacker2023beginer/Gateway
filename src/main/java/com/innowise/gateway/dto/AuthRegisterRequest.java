@@ -1,8 +1,6 @@
 package com.innowise.gateway.dto;
 
 public class AuthRegisterRequest {
-
-
     private Long userId;
     private String login;
     private String password;

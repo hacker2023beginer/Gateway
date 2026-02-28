@@ -1,18 +1,26 @@
 package com.innowise.gateway.dto;
 
-public class UserCreateRequest {
+import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
+
+public class UserCreateRequest {
+//    name, surname, birthDate, email
+    private String name;
+    private String surname;
+    @NotNull
+    private LocalDate birthDate;
     private String email;
-    private String firstName;
-    private String lastName;
 
     public UserCreateRequest(
             String email,
-            String firstName,
-            String lastName) {
+            String name,
+            String surname,
+            LocalDate birthDate) {
         this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.name = name;
+        this.surname = surname;
+        this.birthDate = birthDate;
     }
 
     public UserCreateRequest() {
@@ -26,19 +34,32 @@ public class UserCreateRequest {
         this.email = email;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getName() {
+        return name;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getSurname() {
+        return surname;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    @Override
+    public String toString() {
+        return "UserCreateRequest{email='" + email + "', name='" + name + "', surname='" + surname + "', birthDate=" + birthDate + "}";
     }
 }

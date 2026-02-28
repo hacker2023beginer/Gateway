@@ -1,5 +1,9 @@
 package com.innowise.gateway.dto;
 
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
+
 public class RegistrationRequest {
 
     private String username;
@@ -7,6 +11,8 @@ public class RegistrationRequest {
     private String email;
     private String firstName;
     private String lastName;
+    @NotNull
+    private LocalDate birthDate;
 
     public RegistrationRequest() {
     }
@@ -14,12 +20,14 @@ public class RegistrationRequest {
     public RegistrationRequest(String username, String password,
                                String email,
                                String firstName,
-                               String lastName) {
+                               String lastName,
+                               LocalDate birthDate) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.birthDate = birthDate;
     }
 
     public String getUsername() {
@@ -62,12 +70,20 @@ public class RegistrationRequest {
         this.lastName = lastName;
     }
 
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
 
     public AuthRegisterRequest toAuthDto(Long userId) {
         return new AuthRegisterRequest(userId, username, password);
     }
 
     public UserCreateRequest toUserDto() {
-        return new UserCreateRequest(email, firstName, lastName);
+        LocalDate effectiveBirthDate = birthDate != null ? birthDate : LocalDate.of(1900, 1, 1);
+        return new UserCreateRequest(email, firstName, lastName, effectiveBirthDate);
     }
 }

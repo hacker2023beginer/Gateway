@@ -2,16 +2,15 @@ package com.innowise.gateway.dto;
 
 
 public class AuthResponse {
-
     private Long userId;
-    private String username;
+    private String login;
 
     public AuthResponse() {
     }
 
-    public AuthResponse(Long userId, String username) {
+    public AuthResponse(Long userId, String login) {
         this.userId = userId;
-        this.username = username;
+        this.login = login;
     }
 
     public Long getUserId() {
@@ -22,11 +21,12 @@ public class AuthResponse {
         this.userId = userId;
     }
 
-    public String getUsername() {
-        return username;
+    public String getLogin() {
+        return login;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setLogin(String login) {
+        this.login = login;
     }
+
 }

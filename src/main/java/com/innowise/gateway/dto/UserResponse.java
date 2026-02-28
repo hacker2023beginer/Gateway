@@ -1,65 +1,82 @@
 package com.innowise.gateway.dto;
 
-public class UserResponse {
+import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
+
+public class UserResponse {
+    //id, name, surname, birthDate, email, active
     private Long id;
-    private Long userId;   // id из auth-service
+    private String name;
+    private String surname;
+    @NotNull
+    private LocalDate birthDate;
     private String email;
-    private String firstName;
-    private String lastName;
+    private boolean active;
 
     public UserResponse() {
     }
 
     public UserResponse(Long id,
-                        Long userId,
+                        String name,
+                        String surname,
+                        LocalDate birthDate,
                         String email,
-                        String firstName,
-                        String lastName) {
+                        boolean active) {
         this.id = id;
-        this.userId = userId;
+        this.name = name;
+        this.surname = surname;
+        this.birthDate = birthDate;
         this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.active = active;
     }
 
     public Long getId() {
         return id;
     }
 
-    public Long getUserId() {
-        return userId;
-    }
 
     public String getEmail() {
         return email;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getName() {
+        return name;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getSurname() {
+        return surname;
     }
 
     public void setId(Long id) {
         this.id = id;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
     public void setEmail(String email) {
         this.email = email;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }
