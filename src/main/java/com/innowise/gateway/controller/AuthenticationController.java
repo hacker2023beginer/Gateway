@@ -45,11 +45,11 @@ public class AuthenticationController {
                 .uri(userServiceUrl + "/users")
                 .bodyValue(userDto)
                 .retrieve()
-                .bodyToMono(UserResponse.class)
+                .bodyToMono(UserRequestAndResponse.class)
                 .doOnError(WebClientResponseException.class, ex ->
                         log.error("Error from user-service: {} - {}", ex.getStatusCode(), ex.getResponseBodyAsString()))
-                .flatMap(userResponse -> {
-                    Long userId = userResponse.getId();
+                .flatMap(userRequestAndResponse -> {
+                    Long userId = userRequestAndResponse.getId();
 
                     return webClient.post()
                             .uri(authServiceUrl + "/auth/register")

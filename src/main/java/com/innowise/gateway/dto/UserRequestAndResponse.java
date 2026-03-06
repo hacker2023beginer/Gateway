@@ -4,8 +4,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
-public class UserResponse {
-    //id, name, surname, birthDate, email, active
+public class UserRequestAndResponse {
     private Long id;
     private String name;
     private String surname;
@@ -14,15 +13,15 @@ public class UserResponse {
     private String email;
     private boolean active;
 
-    public UserResponse() {
+    public UserRequestAndResponse() {
     }
 
-    public UserResponse(Long id,
-                        String name,
-                        String surname,
-                        LocalDate birthDate,
-                        String email,
-                        boolean active) {
+    public UserRequestAndResponse(Long id,
+                                  String name,
+                                  String surname,
+                                  LocalDate birthDate,
+                                  String email,
+                                  boolean active) {
         this.id = id;
         this.name = name;
         this.surname = surname;

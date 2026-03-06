@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 public class UserCreateRequest {
-//    name, surname, birthDate, email
     private String name;
     private String surname;
     @NotNull
