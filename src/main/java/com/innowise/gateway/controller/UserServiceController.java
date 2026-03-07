@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -18,9 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
-
 import java.util.List;
-import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/users")
@@ -35,10 +32,12 @@ public class UserServiceController {
     }
 
     @GetMapping("/email")
-    public Mono<ResponseEntity<UserRequestAndResponse>> getUserByEmail(@RequestParam String email) {
+    public Mono<ResponseEntity<UserRequestAndResponse>> getUserByEmail(@RequestParam String email, ServerHttpRequest request) {
 
         return webClient.get()
                 .uri(userServiceUrl + "/users/by-email?email=" + email)
+                .header(HttpHeaders.AUTHORIZATION,
+                        request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
                 .retrieve()
                 .bodyToMono(UserRequestAndResponse.class)
                 .map(ResponseEntity::ok)
