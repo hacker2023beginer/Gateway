@@ -1,4 +1,4 @@
-package com.innowise.gateway.dto;
+package com.innowise.gateway.dto.request;
 
 public class LoginRequest {
     private String login;

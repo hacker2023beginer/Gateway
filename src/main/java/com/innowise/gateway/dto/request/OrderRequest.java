@@ -1,10 +1,8 @@
-package com.innowise.gateway.dto;
+package com.innowise.gateway.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
-
-import java.time.LocalDateTime;
 
 public class OrderRequest {
 

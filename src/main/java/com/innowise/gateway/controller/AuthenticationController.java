@@ -1,8 +1,12 @@
 package com.innowise.gateway.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.innowise.gateway.dto.*;
+import com.innowise.gateway.dto.request.CredentialsRequest;
+import com.innowise.gateway.dto.request.LoginRequest;
+import com.innowise.gateway.dto.request.RegistrationRequest;
+import com.innowise.gateway.dto.request.UserCreateRequest;
+import com.innowise.gateway.dto.response.AuthResponse;
+import com.innowise.gateway.dto.response.LoginResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,22 +29,14 @@ public class AuthenticationController {
     private String authServiceUrl;
 
     private final WebClient webClient;
-    private final ObjectMapper objectMapper;
 
-    public AuthenticationController(WebClient.Builder builder, ObjectMapper objectMapper) {
+    public AuthenticationController(WebClient.Builder builder) {
         this.webClient = builder.build();
-        this.objectMapper = objectMapper;
     }
 
     @PostMapping("/register")
     public Mono<ResponseEntity<String>> register(@RequestBody RegistrationRequest request) {
         UserCreateRequest userDto = request.toUserDto();
-        try {
-            log.info("Sending to user-service: {} -> JSON: {}", userDto, objectMapper.writeValueAsString(userDto));
-        } catch (JsonProcessingException e) {
-            log.warn("Could not serialize userDto for logging: {}", e.getMessage());
-        }
-
         return webClient.post()
                 .uri(userServiceUrl + "/users")
                 .bodyValue(userDto)
@@ -78,7 +74,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    private Mono<ResponseEntity<LoginResponse>> login(@RequestBody LoginRequest request){
+    public Mono<ResponseEntity<LoginResponse>> login(@RequestBody LoginRequest request){
         return webClient.post()
                 .uri(authServiceUrl + "/auth/login")
                 .bodyValue(request)
@@ -93,7 +89,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/credentials")
-    private Mono<ResponseEntity<String>> saveCredentials(@RequestBody CredentialsRequest request){
+    public Mono<ResponseEntity<String>> saveCredentials(@RequestBody CredentialsRequest request){
         return webClient.post()
                 .uri(authServiceUrl + "/auth/credentials")
                 .bodyValue(request)

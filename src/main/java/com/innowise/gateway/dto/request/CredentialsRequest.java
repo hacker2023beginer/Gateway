@@ -1,4 +1,6 @@
-package com.innowise.gateway.dto;
+package com.innowise.gateway.dto.request;
+
+import com.innowise.gateway.dto.Role;
 
 public class CredentialsRequest {
     private Long userId;

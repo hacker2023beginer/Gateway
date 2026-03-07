@@ -1,5 +1,6 @@
-package com.innowise.gateway.dto;
+package com.innowise.gateway.dto.response;
 
+import com.innowise.gateway.dto.UserRequestAndResponse;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;

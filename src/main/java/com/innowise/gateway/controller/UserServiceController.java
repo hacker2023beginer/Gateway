@@ -3,8 +3,6 @@ package com.innowise.gateway.controller;
 import com.innowise.gateway.dto.PaymentCardRequestAndResponse;
 import com.innowise.gateway.dto.UserRequestAndResponse;
 import jakarta.validation.Valid;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
@@ -22,7 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/users")
 public class UserServiceController {
-    private static final Logger log = LoggerFactory.getLogger(UserServiceController.class);
+    public static final String USER_PATH = "/users/";
     @Value("${services.user-service.url}")
     private String userServiceUrl;
     private final WebClient webClient;
@@ -69,7 +67,7 @@ public class UserServiceController {
     @GetMapping("/{id}")
     public Mono<ResponseEntity<UserRequestAndResponse>> getUserById(@PathVariable Long id, ServerHttpRequest request) {
         return webClient.get()
-                .uri(userServiceUrl + "/users/" + id)
+                .uri(userServiceUrl + USER_PATH + id)
                 .header(HttpHeaders.AUTHORIZATION,
                         request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
                 .retrieve()
@@ -86,7 +84,7 @@ public class UserServiceController {
             ServerHttpRequest request) {
 
         return webClient.get()
-                .uri(userServiceUrl + "/users/" + id + "/cards")
+                .uri(userServiceUrl + USER_PATH + id + "/cards")
                 .header(HttpHeaders.AUTHORIZATION,
                         request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
                 .retrieve()
@@ -136,7 +134,7 @@ public class UserServiceController {
             @RequestBody @Valid UserRequestAndResponse userRequest,
             ServerHttpRequest request) {
         return webClient.put()
-                .uri(userServiceUrl + "/users/" + id)
+                .uri(userServiceUrl + USER_PATH + id)
                 .header(HttpHeaders.AUTHORIZATION,
                         request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
                 .bodyValue(userRequest)
@@ -150,12 +148,6 @@ public class UserServiceController {
                 );
     }
 
-    //    @PreAuthorize("hasRole('ADMIN')")
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> delete(@PathVariable Long id) {
-//        userService.deleteUser(id);
-//        return ResponseEntity.noContent().build();
-//    }
     @DeleteMapping("/delete/{id}")
     public Mono<ResponseEntity<Void>> deleteUserById(@PathVariable Long id, ServerHttpRequest request) {
         return webClient.delete()
@@ -175,7 +167,7 @@ public class UserServiceController {
     @PatchMapping("/deactivate/{id}")
     public Mono<ResponseEntity<Void>> deactivateUser(@PathVariable Long id, ServerHttpRequest request) {
         return webClient.patch()
-                .uri(userServiceUrl + "/users/" + id + "/deactivate")
+                .uri(userServiceUrl + USER_PATH + id + "/deactivate")
                 .header(HttpHeaders.AUTHORIZATION,
                         request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
                 .retrieve()
@@ -191,7 +183,7 @@ public class UserServiceController {
     @PatchMapping("/activate/{id}")
     public Mono<ResponseEntity<Void>> activateUser(@PathVariable Long id, ServerHttpRequest request) {
         return webClient.patch()
-                .uri(userServiceUrl + "/users/" + id + "/activate")
+                .uri(userServiceUrl + USER_PATH + id + "/activate")
                 .header(HttpHeaders.AUTHORIZATION,
                         request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
                 .retrieve()

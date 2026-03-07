@@ -1,4 +1,4 @@
-package com.innowise.gateway.dto;
+package com.innowise.gateway.dto.response;
 
 public class LoginResponse {
     private String accessToken;
