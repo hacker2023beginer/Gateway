@@ -6,6 +6,7 @@ import com.innowise.gateway.dto.request.OrderRequest;
 import com.innowise.gateway.dto.response.ItemResponse;
 import com.innowise.gateway.dto.response.OrderItemResponse;
 import com.innowise.gateway.dto.response.OrderResponse;
+import com.innowise.gateway.dto.response.PageResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -111,9 +112,10 @@ public class OrderServiceController {
     }
 
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<OrderResponse>> getOrderById(@PathVariable Long id){
+    public Mono<ResponseEntity<OrderResponse>> getOrderById(@PathVariable Long id, ServerHttpRequest request){
         return webClient.get()
                 .uri(orderServiceUrl + ORDER_PATH + id)
+                .header(HttpHeaders.AUTHORIZATION, request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
                 .retrieve()
                 .bodyToMono(OrderResponse.class)
                 .map(ResponseEntity::ok)
@@ -125,12 +127,13 @@ public class OrderServiceController {
     }
 
     @GetMapping()
-    public Mono<ResponseEntity<Page<OrderResponse>>> getOrders(
+    public Mono<ResponseEntity<PageResponse<OrderResponse>>> getOrders(
             @RequestParam(required = false) String from,
             @RequestParam(required = false) String to,
             @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            ServerHttpRequest request
     ) {
 
         StringBuilder uri = new StringBuilder(orderServiceUrl + "/orders?page=" + page + "&size=" + size);
@@ -146,18 +149,21 @@ public class OrderServiceController {
         if (status != null) {
             uri.append("&status=").append(status);
         }
-
+        String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         return webClient.get()
                 .uri(uri.toString())
+                .header(HttpHeaders.AUTHORIZATION, authHeader)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<PageImpl<OrderResponse>>() {})
+                .bodyToMono(new ParameterizedTypeReference<PageResponse<OrderResponse>>() {})
                 .map(ResponseEntity::ok);
     }
 
     @GetMapping("/byuserid/{id}")
-    public Mono<ResponseEntity<List<OrderResponse>>> getOrdersByUserId(@PathVariable Long id){
+    public Mono<ResponseEntity<List<OrderResponse>>> getOrdersByUserId(@PathVariable Long id, ServerHttpRequest request){
+        String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         return webClient.get()
                 .uri(orderServiceUrl + "/orders/userid/" + id)
+                .header(HttpHeaders.AUTHORIZATION, authHeader)
                 .retrieve()
                 .bodyToFlux(OrderResponse.class)
                 .collectList()
@@ -170,9 +176,11 @@ public class OrderServiceController {
     }
 
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<OrderResponse>> updateOrderById(@PathVariable Long id, @RequestBody OrderRequest orderRequest){
+    public Mono<ResponseEntity<OrderResponse>> updateOrderById(@PathVariable Long id, @RequestBody OrderRequest orderRequest,
+                                                               ServerHttpRequest request){
         return webClient.put()
                 .uri(orderServiceUrl + ORDER_PATH + id)
+                .header(HttpHeaders.AUTHORIZATION, request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
                 .bodyValue(orderRequest)
                 .retrieve()
                 .bodyToMono(OrderResponse.class)
