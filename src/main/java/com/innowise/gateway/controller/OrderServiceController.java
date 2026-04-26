@@ -23,6 +23,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/orders")
 public class OrderServiceController {
     public static final String ORDER_ITEM_PATH = "/orderitems/";
@@ -57,6 +58,21 @@ public class OrderServiceController {
                 .uri(orderServiceUrl + ITEM_PATH + id)
                 .retrieve()
                 .bodyToMono(ItemResponse.class)
+                .map(ResponseEntity::ok)
+                .onErrorResume(WebClientResponseException.class, ex ->
+                        Mono.just(ResponseEntity
+                                .status(ex.getStatusCode())
+                                .build())
+                );
+    }
+
+    @GetMapping("/items")
+    public Mono<ResponseEntity<List<ItemResponse>>> getItems() {
+        return webClient.get()
+                .uri(orderServiceUrl + "/items")
+                .retrieve()
+                .bodyToFlux(ItemResponse.class)
+                .collectList()
                 .map(ResponseEntity::ok)
                 .onErrorResume(WebClientResponseException.class, ex ->
                         Mono.just(ResponseEntity
@@ -127,35 +143,29 @@ public class OrderServiceController {
     }
 
     @GetMapping()
-    public Mono<ResponseEntity<PageResponse<OrderResponse>>> getOrders(
-            @RequestParam(required = false) String from,
-            @RequestParam(required = false) String to,
-            @RequestParam(required = false) String status,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            ServerHttpRequest request
+    public Mono<ResponseEntity<String>> getOrders(
+                                                   @RequestParam(required = false) String from,
+                                                   @RequestParam(required = false) String to,
+                                                   @RequestParam(required = false) String status,
+                                                   @RequestParam(defaultValue = "0") int page,
+                                                   @RequestParam(defaultValue = "10") int size,
+                                                   ServerHttpRequest request
     ) {
-
         StringBuilder uri = new StringBuilder(orderServiceUrl + "/orders?page=" + page + "&size=" + size);
+        if (from != null) uri.append("&from=").append(from);
+        if (to != null) uri.append("&to=").append(to);
+        if (status != null) uri.append("&status=").append(status);
 
-        if (from != null) {
-            uri.append("&from=").append(from);
-        }
-
-        if (to != null) {
-            uri.append("&to=").append(to);
-        }
-
-        if (status != null) {
-            uri.append("&status=").append(status);
-        }
         String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
         return webClient.get()
                 .uri(uri.toString())
                 .header(HttpHeaders.AUTHORIZATION, authHeader)
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<PageResponse<OrderResponse>>() {})
-                .map(ResponseEntity::ok);
+                .bodyToMono(String.class) // <-- Просто забираем сырой JSON
+                .map(ResponseEntity::ok)
+                .onErrorResume(WebClientResponseException.class, ex ->
+                        Mono.just(ResponseEntity.status(ex.getStatusCode()).build())
+                );
     }
 
     @GetMapping("/byuserid/{id}")

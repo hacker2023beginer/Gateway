@@ -8,6 +8,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import java.util.List;
 
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 @RequestMapping("/users")
 public class UserServiceController {
     public static final String USER_PATH = "/users/";
@@ -78,6 +80,99 @@ public class UserServiceController {
                 );
     }
 
+    @PostMapping("/cards")
+    public Mono<ResponseEntity<PaymentCardRequestAndResponse>> createCard(
+            @RequestBody @Valid PaymentCardRequestAndResponse paymentCardRequest,
+            ServerHttpRequest request
+    ) {
+        return webClient.post()
+                .uri(userServiceUrl + "/cards")
+                .header(HttpHeaders.AUTHORIZATION,
+                        request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
+                .bodyValue(paymentCardRequest)
+                .retrieve()
+                .bodyToMono(PaymentCardRequestAndResponse.class)
+                .map(ResponseEntity::ok)
+                .onErrorResume(WebClientResponseException.class, ex ->
+                        Mono.just(ResponseEntity.status(ex.getStatusCode()).build())
+                );
+    }
+
+    @GetMapping("/cards/{id}")
+    public Mono<ResponseEntity<PaymentCardRequestAndResponse>> getById(@PathVariable Long id, ServerHttpRequest request) {
+        return webClient.get()
+                .uri(userServiceUrl + "/cards/" + id)
+                .header(HttpHeaders.AUTHORIZATION,
+                        request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
+                .retrieve()
+                .bodyToMono(PaymentCardRequestAndResponse.class)
+                .map(ResponseEntity::ok)
+                .onErrorResume(WebClientResponseException.class, ex ->
+                        Mono.just(ResponseEntity.status(ex.getStatusCode()).build())
+                );
+    }
+
+    @PutMapping("/cards/{id}")
+    public Mono<ResponseEntity<PaymentCardRequestAndResponse>> updateCard(
+            @PathVariable Long id,
+            @RequestBody @Valid PaymentCardRequestAndResponse paymentCardRequest,
+            ServerHttpRequest request
+    ) {
+        return webClient.put()
+                .uri(userServiceUrl + "/cards/" + id)
+                .header(HttpHeaders.AUTHORIZATION,
+                        request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
+                .bodyValue(paymentCardRequest)
+                .retrieve()
+                .bodyToMono(PaymentCardRequestAndResponse.class)
+                .map(ResponseEntity::ok)
+                .onErrorResume(WebClientResponseException.class, ex ->
+                        Mono.just(ResponseEntity.status(ex.getStatusCode()).build())
+                );
+    }
+
+    @DeleteMapping("/cards/{id}")
+    public Mono<ResponseEntity<Void>> delete(@PathVariable Long id, ServerHttpRequest request) {
+        return webClient.delete()
+                .uri(userServiceUrl + "/cards/" + id)
+                .header(HttpHeaders.AUTHORIZATION,
+                        request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
+                .retrieve()
+                .bodyToMono(Void.class)
+                .map(ResponseEntity::ok)
+                .onErrorResume(WebClientResponseException.class, ex ->
+                        Mono.just(ResponseEntity.status(ex.getStatusCode()).build())
+                );
+    }
+
+    @PatchMapping("/cards/{id}/activate")
+    public Mono<ResponseEntity<Void>> activate(@PathVariable Long id, ServerHttpRequest request) {
+        return webClient.patch()
+                .uri(userServiceUrl + "/cards/" + id + "/activate")
+                .header(HttpHeaders.AUTHORIZATION,
+                        request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
+                .retrieve()
+                .bodyToMono(Void.class)
+                .map(ResponseEntity::ok)
+                .onErrorResume(WebClientResponseException.class, ex ->
+                        Mono.just(ResponseEntity.status(ex.getStatusCode()).build())
+                );
+    }
+
+    @PatchMapping("/cards/{id}/deactivate")
+    public Mono<ResponseEntity<Void>> deactivate(@PathVariable Long id, ServerHttpRequest request) {
+        return webClient.patch()
+                .uri(userServiceUrl + "/cards/" + id + "/deactivate")
+                .header(HttpHeaders.AUTHORIZATION,
+                        request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
+                .retrieve()
+                .bodyToMono(Void.class)
+                .map(ResponseEntity::ok)
+                .onErrorResume(WebClientResponseException.class, ex ->
+                        Mono.just(ResponseEntity.status(ex.getStatusCode()).build())
+                );
+    }
+
     @GetMapping("/{id}/cards")
     public Mono<ResponseEntity<List<PaymentCardRequestAndResponse>>> getUserCardsById(
             @PathVariable Long id,
@@ -98,38 +193,31 @@ public class UserServiceController {
                 );
     }
 
-    //issue with Page
     @GetMapping
-    public Mono<ResponseEntity<Page<UserRequestAndResponse>>> getUsers(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String surname,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            ServerHttpRequest request
+    public Mono<ResponseEntity<String>> getUsers(
+                                                  @RequestParam(required = false) String name,
+                                                  @RequestParam(required = false) String surname,
+                                                  @RequestParam(defaultValue = "0") int page,
+                                                  @RequestParam(defaultValue = "10") int size,
+                                                  ServerHttpRequest request
     ) {
-
         StringBuilder uri = new StringBuilder(userServiceUrl + "/users?page=" + page + "&size=" + size);
-
-        if (name != null) {
-            uri.append("&name=").append(name);
-        }
-
-        if (surname != null) {
-            uri.append("&surname=").append(surname);
-        }
+        if (name != null) uri.append("&name=").append(name);
+        if (surname != null) uri.append("&surname=").append(surname);
 
         return webClient.get()
                 .uri(uri.toString())
-                .header(HttpHeaders.AUTHORIZATION,
-                        request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
+                .header(HttpHeaders.AUTHORIZATION, request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION))
                 .retrieve()
-                .bodyToMono(new ParameterizedTypeReference<PageImpl<UserRequestAndResponse>>() {
-                })
-                .map(ResponseEntity::ok);
+                .bodyToMono(String.class)
+                .map(ResponseEntity::ok)
+                .onErrorResume(WebClientResponseException.class, ex ->
+                        Mono.just(ResponseEntity.status(ex.getStatusCode()).build())
+                );
     }
 
     @PutMapping("/update/{id}")
-    public Mono<ResponseEntity<UserRequestAndResponse>> getUserById(
+    public Mono<ResponseEntity<UserRequestAndResponse>> updateUserById(
             @PathVariable Long id,
             @RequestBody @Valid UserRequestAndResponse userRequest,
             ServerHttpRequest request) {

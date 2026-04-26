@@ -1,10 +1,7 @@
 package com.innowise.gateway.controller;
 
 import com.innowise.gateway.dto.*;
-import com.innowise.gateway.dto.request.CredentialsRequest;
-import com.innowise.gateway.dto.request.LoginRequest;
-import com.innowise.gateway.dto.request.RegistrationRequest;
-import com.innowise.gateway.dto.request.UserCreateRequest;
+import com.innowise.gateway.dto.request.*;
 import com.innowise.gateway.dto.response.AuthResponse;
 import com.innowise.gateway.dto.response.LoginResponse;
 import org.slf4j.Logger;
@@ -12,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,6 +18,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173")
 public class AuthenticationController {
 
     private static final Logger log = LoggerFactory.getLogger(AuthenticationController.class);
@@ -86,6 +85,20 @@ public class AuthenticationController {
                                 .status(ex.getStatusCode())
                                 .build())
                 );
+    }
+
+    @PostMapping("/auth/refresh")
+    public Mono<ResponseEntity<LoginResponse>> refresh(@RequestBody RefreshRequest request) {
+        return webClient.post()
+                .uri(authServiceUrl + "/auth/refresh")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(LoginResponse.class)
+                .map(ResponseEntity::ok)
+                .onErrorResume(WebClientResponseException.class, ex -> {
+                    log.error("Refresh token error: {} - {}", ex.getStatusCode(), ex.getResponseBodyAsString());
+                    return Mono.just(ResponseEntity.status(ex.getStatusCode()).build());
+                });
     }
 
     @PostMapping("/credentials")
