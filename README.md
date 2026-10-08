@@ -54,6 +54,7 @@ services.order-service.url=http://localhost:8083
 services.user-service.url=http://localhost:8082
 services.auth-service.url=http://localhost:8081
 jwt.secret="write yours"
+```
 
 For Kubernetes profile, service URLs are switched to cluster service names such as http://user-service:8082.
 
