@@ -117,6 +117,9 @@ For Kubernetes profile, service URLs are switched to cluster service names such 
 ## Run Locally
 
 Bash:       ./mvnw spring-boot:run
+
 Swagger.ui: http://localhost:8080/webjars/swagger-ui/index.html
+
 Docker:     docker build -t gateway . && docker run -p 8080:8080 gateway
+
 Tests:      ./mvnw test
